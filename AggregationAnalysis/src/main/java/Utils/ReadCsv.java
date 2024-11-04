@@ -19,7 +19,7 @@ public class ReadCsv {
     public static List<ThreeBpFlopIpUnprocessed> read(){
         List<ThreeBpFlopIpUnprocessed> records = new ArrayList<>();
         try {
-            CSVReader csvReader = new CSVReader(new FileReader("C:\\Users\\Super uniqueorn\\Desktop\\Progetti\\AggregationAnalysis\\src\\main\\resources\\report_IP_Full.csv"));
+            CSVReader csvReader = new CSVReader(new FileReader("C:\\Users\\nicolo\\Desktop\\Progetti\\AggregationAnalysis\\src\\main\\resources\\report_IP_Full.csv"));
             List<String[]> csvRecords  = csvReader.readAll();
 
             records = csvRecords .stream()
