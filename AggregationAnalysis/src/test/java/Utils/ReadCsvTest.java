@@ -3,6 +3,8 @@ package Utils;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 
+import java.io.File;
+
 public class ReadCsvTest {
 
     @InjectMocks
@@ -10,6 +12,6 @@ public class ReadCsvTest {
 
     @Test
     public void readTest(){
-        readCsv.read();
+        readCsv.read(new File(""));
     }
 }
