@@ -3,6 +3,8 @@ package org.example;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
+import java.sql.Array;
 import java.util.*;
 
 public class Main {
@@ -32,6 +34,19 @@ public class Main {
 
         LOG.info("starting process.. ");
         LinkedList<String> rouletteNumbersList = new LinkedList<>(Arrays.asList("0", "32", "15", "19", "4", "21", "2", "25", "17", "34", "6", "27", "13", "36", "11", "30", "8", "23", "10", "5", "24", "16", "33", "1", "20", "14", "31", "9", "22", "18", "29", "7", "28", "12", "35", "3", "26"));
+        HashMap<Integer,Double> orfanelliBetMaps = new HashMap<Integer,Double>();
+        orfanelliBetMaps.put(1,1.0);
+        orfanelliBetMaps.put(6,0.5);
+        orfanelliBetMaps.put(9,0.5);
+        orfanelliBetMaps.put(14,0.5);
+        orfanelliBetMaps.put(17,0.5);
+        orfanelliBetMaps.put(201,0.5);
+        orfanelliBetMaps.put(31,0.5);
+        orfanelliBetMaps.put(34,0.5);
+
+        
+
+
         LinkedHashMap<Integer, Description> mapOfNumbers = new LinkedHashMap<Integer, Description>();
         populateMap(mapOfNumbers);
         Integer giocoZeroInt = 0;
@@ -78,9 +93,9 @@ public class Main {
                 gapMap.put(TypeEnum.ORFANELLI.getType(), (((((double) orfanelliInt / i) * 100) - (expectedMap.get(TypeEnum.ORFANELLI.getType()))) / (expectedMap.get(TypeEnum.ORFANELLI.getType()))) * 100);
 
                 for (Map.Entry<String, Double> entry : gapMap.entrySet()) {
-                    if(entry.getValue()<-10.0){
-                        for(TypeEnum type : TypeEnum.values()) {
-                            if(type.getType().equalsIgnoreCase(entry.getKey())){
+                    if (entry.getValue() < -10.0) {
+                        for (TypeEnum type : TypeEnum.values()) {
+                            if (type.getType().equalsIgnoreCase(entry.getKey())) {
                                 operatingMap.put(type.getType(), true);
                                 break;
                             }
@@ -88,7 +103,16 @@ public class Main {
                     }
                 }
 
-                
+
+                for (Map.Entry<String, Boolean> entry : operatingMap.entrySet()) {
+                    if (Boolean.TRUE.equals(entry.getValue())) {
+                        for (TypeEnum typeEnum : TypeEnum.values()) {
+                            if (typeEnum.getType().equalsIgnoreCase(entry.getKey())) {
+                                setTypeOfBet(typeEnum.getType());
+                            }
+                        }
+                    }
+
 
 //            LOG.info("iteration {} - {} {} - {} {} - {} {} - {} {}",
 //                    i,
@@ -103,6 +127,13 @@ public class Main {
 //            );
                 }
             }
+        }
+    }
+
+
+        public static void setTypeOfBet(String type){
+         List<Puntata> listOfNumberToBet = new ArrayList<>();
+
         }
 
 
