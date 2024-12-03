@@ -1,4 +1,4 @@
-package org.example;
+package org.example.analisi;
 
 import java.util.Random;
 

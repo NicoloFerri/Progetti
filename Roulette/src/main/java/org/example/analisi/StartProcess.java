@@ -1,17 +1,17 @@
-package org.example;
+package org.example.analisi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
-import java.sql.Array;
 import java.util.*;
 
-public class Main {
-    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-    public static void main(String[] args) {
+public class StartProcess {
+
+    private static final Logger LOG = LoggerFactory.getLogger(StartProcess.class);
+
+    public static void runBetting(){
         int totalNumbers = 37;
-        int numberOfIteration = 200;
+        int numberOfIteration = 50;
         Random r = new Random();
 
         HashMap<String, Double> expectedMap = new HashMap<String, Double>();
@@ -83,6 +83,7 @@ public class Main {
         Integer orfanelliInt = 0;
 
         int n;
+        double profit = 0d;
         for (int i = 1; i < numberOfIteration; i++) {
             n = Generate.generateNumber(r);
 
@@ -92,45 +93,56 @@ public class Main {
                 viciniDelloZeroInt++;
             } else if (TypeEnum.SERIE_5_8.getType().equalsIgnoreCase(mapOfNumbers.get(n).getType())) {
                 serie58Int++;
-            } 
+            }
 
-            if (i == numberOfIteration / 4) {
+            if (i == numberOfIteration/2) {
                 gapMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), (((((double) viciniDelloZeroInt / i) * 100) - (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) / (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) * 100);
                 gapMap.put(TypeEnum.SERIE_5_8.getType(), (((((double) serie58Int / i) * 100) - (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) / (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) * 100);
                 gapMap.put(TypeEnum.ORFANELLI.getType(), (((((double) orfanelliInt / i) * 100) - (expectedMap.get(TypeEnum.ORFANELLI.getType()))) / (expectedMap.get(TypeEnum.ORFANELLI.getType()))) * 100);
 
                 for (Map.Entry<String, Double> entry : gapMap.entrySet()) {
-                    if (entry.getValue() < -10.0) {
-                        for (TypeEnum type : TypeEnum.values()) {
-                            if (type.getType().equalsIgnoreCase(entry.getKey())) {
-                                operatingMap.put(type.getType(), true);
-                                break;
-                            }
+                    if (entry.getValue() < -20.0) {
+                        if(entry.getKey().equalsIgnoreCase(TypeEnum.VICINI_DELLO_ZERO.getType())){
+                            LOG.info("[STARTING BET] - bet on {} ", TypeEnum.VICINI_DELLO_ZERO.getType());
+                            profit=startBet(numberOfIteration,viciniDelloZeroBetMaps,mapOfNumbers);
+                        }else if(entry.getKey().equalsIgnoreCase(TypeEnum.SERIE_5_8.getType())) {
+                            LOG.info("[STARTING BET] - bet on {} ", TypeEnum.SERIE_5_8.getType());
+                            profit=startBet(numberOfIteration,SerieBetMaps,mapOfNumbers);
+                        }else if(entry.getKey().equalsIgnoreCase(TypeEnum.ORFANELLI.getType())) {
+                            LOG.info("[STARTING BET] - bet on {} ", TypeEnum.ORFANELLI.getType());
+                            profit=startBet(numberOfIteration,orfanelliBetMaps,mapOfNumbers);
                         }
+                        break;
                     }
                 }
-
-
-
-
-//            LOG.info("iteration {} - {} {} - {} {} - {} {} - {} {}",
-//                    i,
-//                    TypeEnum.VICINI_DELLO_ZERO.getType(),
-//                    gapGiocoZero,
-//                    TypeEnum.SERIE_5_8.getType(),
-//                    gapSerie58,
-//                    TypeEnum.VICINI_DELLO_ZERO.getType(),
-//                    gapViciniDelloZero,
-//                    TypeEnum.ORFANELLI.getType(),
-//                    gapOrfanelli
-//            );
-                }
             }
+
+
         }
+        LOG.info("[PROFIT] : {} " , profit);
+
+    }
 
 
-    
-
+    public static Double startBet(int numberOfIteration,HashMap<Integer,Double> betMaps , LinkedHashMap<Integer, Description> mapOfNumbers){
+        LOG.info("Start betting...");
+        Double nPezziBettati = 0d;
+        for(Map.Entry<Integer, Double> entry : betMaps.entrySet()){
+            nPezziBettati=nPezziBettati+entry.getValue();
+        }
+        Double profit = 0d;
+        Random r = new Random();
+        int n;
+        for ( int i=0 ; i<numberOfIteration/2 ; i++){
+            n = Generate.generateNumber(r);
+            profit=profit-nPezziBettati;
+            if(betMaps.get(n)!=null){
+                profit=profit+(betMaps.get(n)*36);
+            }
+            if(profit>0) break;
+        }
+        return profit;
+    }
 
     public static void populateMap(LinkedHashMap<Integer, Description> mapOfNumbers) {
         mapOfNumbers.put(0, new Description("Green", null, null, TypeEnum.VICINI_DELLO_ZERO.getType()));

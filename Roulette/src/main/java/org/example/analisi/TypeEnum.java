@@ -1,4 +1,4 @@
-package org.example;
+package org.example.analisi;
 
 public enum TypeEnum {
     GIOCO_ZERO("gioco zero"),
