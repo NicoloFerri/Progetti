@@ -17,78 +17,85 @@ public class Main {
         HashMap<String, Double> expectedMap = new HashMap<String, Double>();
         expectedMap.put(TypeEnum.ORFANELLI.getType(), ((8.0 / totalNumbers) * 100)); //21.62
         expectedMap.put(TypeEnum.SERIE_5_8.getType(), ((12.0 / totalNumbers) * 100)); //32.43
-        expectedMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), ((10.0 / totalNumbers) * 100)); //27.02
-        expectedMap.put(TypeEnum.GIOCO_ZERO.getType(), ((7.0 / totalNumbers) * 100)); //18.91
+        expectedMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), ((17.0 / totalNumbers) * 100)); //45.94
 
         HashMap<String, Boolean> operatingMap = new HashMap<String, Boolean>();
         operatingMap.put(TypeEnum.ORFANELLI.getType(), false);
         operatingMap.put(TypeEnum.SERIE_5_8.getType(), false);
         operatingMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), false);
-        operatingMap.put(TypeEnum.GIOCO_ZERO.getType(), false);
 
         HashMap<String, Double> gapMap = new HashMap<String, Double>();
         gapMap.put(TypeEnum.ORFANELLI.getType(), 0d);
         gapMap.put(TypeEnum.SERIE_5_8.getType(), 0d);
         gapMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), 0d);
-        gapMap.put(TypeEnum.GIOCO_ZERO.getType(), 0d);
 
         LOG.info("starting process.. ");
         LinkedList<String> rouletteNumbersList = new LinkedList<>(Arrays.asList("0", "32", "15", "19", "4", "21", "2", "25", "17", "34", "6", "27", "13", "36", "11", "30", "8", "23", "10", "5", "24", "16", "33", "1", "20", "14", "31", "9", "22", "18", "29", "7", "28", "12", "35", "3", "26"));
+
         HashMap<Integer,Double> orfanelliBetMaps = new HashMap<Integer,Double>();
         orfanelliBetMaps.put(1,1.0);
         orfanelliBetMaps.put(6,0.5);
         orfanelliBetMaps.put(9,0.5);
         orfanelliBetMaps.put(14,0.5);
         orfanelliBetMaps.put(17,0.5);
-        orfanelliBetMaps.put(201,0.5);
+        orfanelliBetMaps.put(20,0.5);
         orfanelliBetMaps.put(31,0.5);
         orfanelliBetMaps.put(34,0.5);
 
-        
+        HashMap<Integer,Double> viciniDelloZeroBetMaps = new HashMap<>();
+        viciniDelloZeroBetMaps.put(0,0.5);
+        viciniDelloZeroBetMaps.put(2,0.5);
+        viciniDelloZeroBetMaps.put(3,0.5);
+        viciniDelloZeroBetMaps.put(4,0.5);
+        viciniDelloZeroBetMaps.put(7,0.5);
+        viciniDelloZeroBetMaps.put(12,0.5);
+        viciniDelloZeroBetMaps.put(15,0.5);
+        viciniDelloZeroBetMaps.put(18,0.5);
+        viciniDelloZeroBetMaps.put(21,0.5);
+        viciniDelloZeroBetMaps.put(19,0.5);
+        viciniDelloZeroBetMaps.put(22,0.5);
+        viciniDelloZeroBetMaps.put(25,0.5);
+        viciniDelloZeroBetMaps.put(26,0.5);
+        viciniDelloZeroBetMaps.put(28,0.5);
+        viciniDelloZeroBetMaps.put(29,0.5);
+        viciniDelloZeroBetMaps.put(32,0.5);
+        viciniDelloZeroBetMaps.put(35,0.5);
+
+        HashMap<Integer,Double> SerieBetMaps = new HashMap<>();
+        SerieBetMaps.put(5,0.5);
+        SerieBetMaps.put(8,0.5);
+        SerieBetMaps.put(11,0.5);
+        SerieBetMaps.put(10,0.5);
+        SerieBetMaps.put(13,0.5);
+        SerieBetMaps.put(16,0.5);
+        SerieBetMaps.put(23,0.5);
+        SerieBetMaps.put(24,0.5);
+        SerieBetMaps.put(27,0.5);
+        SerieBetMaps.put(30,0.5);
+        SerieBetMaps.put(32,0.5);
+        SerieBetMaps.put(36,0.5);
 
 
         LinkedHashMap<Integer, Description> mapOfNumbers = new LinkedHashMap<Integer, Description>();
         populateMap(mapOfNumbers);
-        Integer giocoZeroInt = 0;
-        Double giocoZeroMed = 0D;
         Integer viciniDelloZeroInt = 0;
-        Double viciniDelloZeroMed = 0D;
         Integer serie58Int = 0;
-        Double serie58Med = 0D;
         Integer orfanelliInt = 0;
-        Double orfanelliMed = 0D;
 
-        double gapGiocoZero = 0d;
-        double gapSerie58 = 0d;
-        double gapViciniDelloZero = 0d;
-        double gapOrfanelli = 0d;
         int n;
         for (int i = 1; i < numberOfIteration; i++) {
             n = Generate.generateNumber(r);
-//           LOG.info("[NUMERO] {} - [COLOR] {} - [RIGA] {} - [COLONNA] {} - {} ",
-//                   n ,
-//                   mapOfNumbers.get(n).getColor(),
-//                   mapOfNumbers.get(n).getRiga(),
-//                   mapOfNumbers.get(n).getColonna(),
-//                   mapOfNumbers.get(n).getType()
-//           );
+
             if (TypeEnum.ORFANELLI.getType().equalsIgnoreCase(mapOfNumbers.get(n).getType())) {
                 orfanelliInt++;
-
-                ;
             } else if (TypeEnum.VICINI_DELLO_ZERO.getType().equalsIgnoreCase(mapOfNumbers.get(n).getType())) {
                 viciniDelloZeroInt++;
-
             } else if (TypeEnum.SERIE_5_8.getType().equalsIgnoreCase(mapOfNumbers.get(n).getType())) {
                 serie58Int++;
-
-            } else {
-                giocoZeroInt++;
-            }
+            } 
 
             if (i == numberOfIteration / 4) {
                 gapMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), (((((double) viciniDelloZeroInt / i) * 100) - (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) / (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) * 100);
-                gapMap.put(TypeEnum.GIOCO_ZERO.getType(), (((((double) giocoZeroInt / i) * 100) - (expectedMap.get(TypeEnum.GIOCO_ZERO.getType()))) / (expectedMap.get(TypeEnum.GIOCO_ZERO.getType()))) * 100);
                 gapMap.put(TypeEnum.SERIE_5_8.getType(), (((((double) serie58Int / i) * 100) - (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) / (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) * 100);
                 gapMap.put(TypeEnum.ORFANELLI.getType(), (((((double) orfanelliInt / i) * 100) - (expectedMap.get(TypeEnum.ORFANELLI.getType()))) / (expectedMap.get(TypeEnum.ORFANELLI.getType()))) * 100);
 
@@ -104,19 +111,11 @@ public class Main {
                 }
 
 
-                for (Map.Entry<String, Boolean> entry : operatingMap.entrySet()) {
-                    if (Boolean.TRUE.equals(entry.getValue())) {
-                        for (TypeEnum typeEnum : TypeEnum.values()) {
-                            if (typeEnum.getType().equalsIgnoreCase(entry.getKey())) {
-                                setTypeOfBet(typeEnum.getType());
-                            }
-                        }
-                    }
 
 
 //            LOG.info("iteration {} - {} {} - {} {} - {} {} - {} {}",
 //                    i,
-//                    TypeEnum.GIOCO_ZERO.getType(),
+//                    TypeEnum.VICINI_DELLO_ZERO.getType(),
 //                    gapGiocoZero,
 //                    TypeEnum.SERIE_5_8.getType(),
 //                    gapSerie58,
@@ -128,19 +127,15 @@ public class Main {
                 }
             }
         }
-    }
 
 
-        public static void setTypeOfBet(String type){
-         List<Puntata> listOfNumberToBet = new ArrayList<>();
-
-        }
+    
 
 
     public static void populateMap(LinkedHashMap<Integer, Description> mapOfNumbers) {
-        mapOfNumbers.put(0, new Description("Green", null, null, TypeEnum.GIOCO_ZERO.getType()));
-        mapOfNumbers.put(32, new Description("Red", 2, 3, TypeEnum.GIOCO_ZERO.getType()));
-        mapOfNumbers.put(15, new Description("Black", 1, 1, TypeEnum.GIOCO_ZERO.getType()));
+        mapOfNumbers.put(0, new Description("Green", null, null, TypeEnum.VICINI_DELLO_ZERO.getType()));
+        mapOfNumbers.put(32, new Description("Red", 2, 3, TypeEnum.VICINI_DELLO_ZERO.getType()));
+        mapOfNumbers.put(15, new Description("Black", 1, 1, TypeEnum.VICINI_DELLO_ZERO.getType()));
         mapOfNumbers.put(19, new Description("Red", 2, 2, TypeEnum.VICINI_DELLO_ZERO.getType()));
         mapOfNumbers.put(4, new Description("Black", 1, 3, TypeEnum.VICINI_DELLO_ZERO.getType()));
         mapOfNumbers.put(21, new Description("Red", 2, 1, TypeEnum.VICINI_DELLO_ZERO.getType()));
@@ -171,10 +166,10 @@ public class Main {
         mapOfNumbers.put(29, new Description("Black", 3, 1, TypeEnum.VICINI_DELLO_ZERO.getType()));
         mapOfNumbers.put(7, new Description("Red", 1, 1, TypeEnum.VICINI_DELLO_ZERO.getType()));
         mapOfNumbers.put(28, new Description("Black", 3, 1, TypeEnum.VICINI_DELLO_ZERO.getType()));
-        mapOfNumbers.put(12, new Description("Red", 2, 1, TypeEnum.GIOCO_ZERO.getType()));
-        mapOfNumbers.put(35, new Description("Black", 3, 3, TypeEnum.GIOCO_ZERO.getType()));
-        mapOfNumbers.put(3, new Description("Red", 1, 3, TypeEnum.GIOCO_ZERO.getType()));
-        mapOfNumbers.put(26, new Description("Black", 3, 2, TypeEnum.GIOCO_ZERO.getType()));
+        mapOfNumbers.put(12, new Description("Red", 2, 1, TypeEnum.VICINI_DELLO_ZERO.getType()));
+        mapOfNumbers.put(35, new Description("Black", 3, 3, TypeEnum.VICINI_DELLO_ZERO.getType()));
+        mapOfNumbers.put(3, new Description("Red", 1, 3, TypeEnum.VICINI_DELLO_ZERO.getType()));
+        mapOfNumbers.put(26, new Description("Black", 3, 2, TypeEnum.VICINI_DELLO_ZERO.getType()));
     }
 
 }
