@@ -39,7 +39,7 @@ public class StartProcessTest {
         SerieBetMaps.put(32,0.5);
         SerieBetMaps.put(36,0.5);
 
-        Double profit = StartProcess.startBet(50,SerieBetMaps,mapOfNumbers);
-        LOG.info("final profit : {} " ,  profit);
+        //Double profit = StartProcess.startBet(50,SerieBetMaps,mapOfNumbers,30);
+        //LOG.info("final profit : {} " ,  profit);
     }
 }

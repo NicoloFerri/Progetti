@@ -1,8 +1,15 @@
 package org.example.analisi;
 
+import com.opencsv.CSVWriter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class StartProcess {
@@ -11,8 +18,13 @@ public class StartProcess {
 
     public static void runBetting(){
         int totalNumbers = 37;
-        int numberOfIteration = 50;
-        Random r = new Random();
+        int iterationForTest = 100;
+        double sogliaToStartBet = -30.0;
+        int duration = 1000000000;
+
+        LOG.info("initialize Sequence...");
+        Integer[] sequence = returnSequence(duration);
+
 
         HashMap<String, Double> expectedMap = new HashMap<String, Double>();
         expectedMap.put(TypeEnum.ORFANELLI.getType(), ((8.0 / totalNumbers) * 100)); //21.62
@@ -29,8 +41,8 @@ public class StartProcess {
         gapMap.put(TypeEnum.SERIE_5_8.getType(), 0d);
         gapMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), 0d);
 
-        LOG.info("starting process.. ");
-        LinkedList<String> rouletteNumbersList = new LinkedList<>(Arrays.asList("0", "32", "15", "19", "4", "21", "2", "25", "17", "34", "6", "27", "13", "36", "11", "30", "8", "23", "10", "5", "24", "16", "33", "1", "20", "14", "31", "9", "22", "18", "29", "7", "28", "12", "35", "3", "26"));
+        //LOG.info("starting process.. ");
+        //LinkedList<String> rouletteNumbersList = new LinkedList<>(Arrays.asList("0", "32", "15", "19", "4", "21", "2", "25", "17", "34", "6", "27", "13", "36", "11", "30", "8", "23", "10", "5", "24", "16", "33", "1", "20", "14", "31", "9", "22", "18", "29", "7", "28", "12", "35", "3", "26"));
 
         HashMap<Integer,Double> orfanelliBetMaps = new HashMap<Integer,Double>();
         orfanelliBetMaps.put(1,1.0);
@@ -72,7 +84,7 @@ public class StartProcess {
         SerieBetMaps.put(24,0.5);
         SerieBetMaps.put(27,0.5);
         SerieBetMaps.put(30,0.5);
-        SerieBetMaps.put(32,0.5);
+        SerieBetMaps.put(33,0.5);
         SerieBetMaps.put(36,0.5);
 
 
@@ -83,9 +95,26 @@ public class StartProcess {
         Integer orfanelliInt = 0;
 
         int n;
-        double profit = 0d;
-        for (int i = 1; i < numberOfIteration; i++) {
-            n = Generate.generateNumber(r);
+        int x=0;
+        int iter=0;
+        boolean betMade = false;
+        Report report = new Report(0.0,0);
+
+
+        String filePath = "C:\\Users\\nicolo\\Desktop\\Progetti\\Roulette\\src\\main\\java\\org\\example\\report\\report.csv";
+        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {;
+            writer.writeNext(new String[]{"Data","Da Estrazione", "A Estrazione","GAP", "BetType", "Profit"});
+
+        for (int i = 0; i < sequence.length-1; i++) {
+            n = sequence[i];
+
+            if (betMade){
+                orfanelliInt=0;
+                viciniDelloZeroInt=0;
+                serie58Int=0;
+                iter=0;
+                betMade = false;
+            }
 
             if (TypeEnum.ORFANELLI.getType().equalsIgnoreCase(mapOfNumbers.get(n).getType())) {
                 orfanelliInt++;
@@ -95,53 +124,82 @@ public class StartProcess {
                 serie58Int++;
             }
 
-            if (i == numberOfIteration/2) {
-                gapMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), (((((double) viciniDelloZeroInt / i) * 100) - (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) / (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) * 100);
-                gapMap.put(TypeEnum.SERIE_5_8.getType(), (((((double) serie58Int / i) * 100) - (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) / (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) * 100);
-                gapMap.put(TypeEnum.ORFANELLI.getType(), (((((double) orfanelliInt / i) * 100) - (expectedMap.get(TypeEnum.ORFANELLI.getType()))) / (expectedMap.get(TypeEnum.ORFANELLI.getType()))) * 100);
-
+            iter++;
+            if (iter == iterationForTest){
+                report.setIterazione(i);
+                gapMap.put(TypeEnum.VICINI_DELLO_ZERO.getType(), (((((double) viciniDelloZeroInt / iter) * 100) - (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) / (expectedMap.get(TypeEnum.VICINI_DELLO_ZERO.getType()))) * 100);
+                gapMap.put(TypeEnum.SERIE_5_8.getType(), (((((double) serie58Int / iter) * 100) - (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) / (expectedMap.get(TypeEnum.SERIE_5_8.getType()))) * 100);
+                gapMap.put(TypeEnum.ORFANELLI.getType(), (((((double) orfanelliInt / iter) * 100) - (expectedMap.get(TypeEnum.ORFANELLI.getType()))) / (expectedMap.get(TypeEnum.ORFANELLI.getType()))) * 100);
+                String betOn = "";
                 for (Map.Entry<String, Double> entry : gapMap.entrySet()) {
-                    if (entry.getValue() < -20.0) {
+                    if (entry.getValue() < sogliaToStartBet) {
                         if(entry.getKey().equalsIgnoreCase(TypeEnum.VICINI_DELLO_ZERO.getType())){
                             LOG.info("[STARTING BET] - bet on {} ", TypeEnum.VICINI_DELLO_ZERO.getType());
-                            profit=startBet(numberOfIteration,viciniDelloZeroBetMaps,mapOfNumbers);
+                            startBet(iterationForTest,viciniDelloZeroBetMaps,mapOfNumbers,report,sequence);
+                            betOn=TypeEnum.VICINI_DELLO_ZERO.getType();
                         }else if(entry.getKey().equalsIgnoreCase(TypeEnum.SERIE_5_8.getType())) {
                             LOG.info("[STARTING BET] - bet on {} ", TypeEnum.SERIE_5_8.getType());
-                            profit=startBet(numberOfIteration,SerieBetMaps,mapOfNumbers);
+                            //startBet(iterationForTest,SerieBetMaps,mapOfNumbers,report,sequence);
+                            betOn=TypeEnum.SERIE_5_8.getType();
                         }else if(entry.getKey().equalsIgnoreCase(TypeEnum.ORFANELLI.getType())) {
                             LOG.info("[STARTING BET] - bet on {} ", TypeEnum.ORFANELLI.getType());
-                            profit=startBet(numberOfIteration,orfanelliBetMaps,mapOfNumbers);
+                            //startBet(iterationForTest,orfanelliBetMaps,mapOfNumbers,report,sequence);
+                            betOn=TypeEnum.ORFANELLI.getType();
                         }
                         break;
                     }
                 }
+                if(i!=report.getIterazione()) {
+                    int inizio = i;
+                    int fine = report.getIterazione();
+                    writer.writeNext(new String[]{ LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm:ss")), String.valueOf(inizio),String.valueOf(fine),String.valueOf(fine-inizio),betOn, String.valueOf(report.getProfitto())});
+                    i=report.getIterazione();
+                }
+                betMade=true;
+
             }
-
-
         }
-        LOG.info("[PROFIT] : {} " , profit);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
+    public static Integer[] returnSequence (int duration){
+        Integer[] seq = new Integer[duration];
+        Random r = new Random();
+        for(int i=0 ; i<seq.length ; i++){
+            seq[i]=Generate.generateNumber(r);
+        }
+        return seq;
+    }
 
-    public static Double startBet(int numberOfIteration,HashMap<Integer,Double> betMaps , LinkedHashMap<Integer, Description> mapOfNumbers){
+
+    public static Report startBet(int numberOfIteration,HashMap<Integer,Double> betMaps , LinkedHashMap<Integer, Description> mapOfNumbers, Report report, Integer[] sequence){
         LOG.info("Start betting...");
+        int stopLoss = -50;
         Double nPezziBettati = 0d;
         for(Map.Entry<Integer, Double> entry : betMaps.entrySet()){
             nPezziBettati=nPezziBettati+entry.getValue();
         }
-        Double profit = 0d;
-        Random r = new Random();
+        Double profitStart = report.getProfitto();
+        Double netWon = 0d;
         int n;
-        for ( int i=0 ; i<numberOfIteration/2 ; i++){
-            n = Generate.generateNumber(r);
-            profit=profit-nPezziBettati;
+        int x = report.getIterazione();
+        for ( int i=0 ; i<numberOfIteration ; i++){
+            n = sequence[x];
+            x++;
+            netWon=netWon-nPezziBettati;
             if(betMaps.get(n)!=null){
-                profit=profit+(betMaps.get(n)*36);
+                netWon=netWon+(betMaps.get(n)*36);
             }
-            if(profit>0) break;
+            //if(netWon>0 || netWon < stopLoss) break;
         }
-        return profit;
+
+        report.setIterazione(x);
+        report.setProfitto(profitStart+netWon);
+        return report;
     }
 
     public static void populateMap(LinkedHashMap<Integer, Description> mapOfNumbers) {
