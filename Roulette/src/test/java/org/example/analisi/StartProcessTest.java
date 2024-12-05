@@ -22,7 +22,7 @@ public class StartProcessTest {
     public void startBetTest(){
 
         LinkedHashMap<Integer, Description> mapOfNumbers = new LinkedHashMap<Integer, Description>();
-        StartProcess.populateMap(mapOfNumbers);
+        Utils.populateMap(mapOfNumbers);
 
 
         HashMap<Integer,Double> SerieBetMaps = new HashMap<>();

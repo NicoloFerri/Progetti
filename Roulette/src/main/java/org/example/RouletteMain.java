@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.analisi.CalculateDeviation;
 import org.example.analisi.StartProcess;
 
 import java.io.FileWriter;
@@ -11,8 +12,8 @@ import com.opencsv.CSVWriter;
 public class RouletteMain {
     public static void main(String[] args) throws IOException {
 
-        StartProcess.runBetting();
-
+        //StartProcess.runBetting();
+        CalculateDeviation.calc();
     }
 
 }
